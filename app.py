@@ -15,8 +15,8 @@ def copy_to_clipboard(text):
         pyperclip.copy(text)
         st.success("Copied to clipboard!")
     except pyperclip.PyperclipException as e:
-        st.warning("Clipboard functionality is not supported in this environment. Click the link below:")
-        st.markdown(f"[Go to the website]({text})", unsafe_allow_html=True)
+        st.warning("Clipboard functionality currently not supported. Copy the link address below...")
+        st.markdown(f"[Website]({text})", unsafe_allow_html=True)
 
 def clean_numeric_columns(df, col_names):
     """
@@ -42,6 +42,17 @@ def clean_numeric_columns(df, col_names):
             cleaned_df[col] = pd.to_numeric(cleaned_df[col], errors='coerce')  # Convert to numeric, coercing errors to NaN
     
     return cleaned_df
+
+## Introduction
+st.title("Wikipedia Table Scraper")
+st.subheader("Introduction")
+st.write("""
+         This app is one of many options in the world to easily webscrape data for personal use. Wikipedia 
+         is open source, and thus one of the most webscraped domains on the internt. However, webscraping can be difficult for those not
+         familiar to it. Furthermore, copying and pasting raw data from a Wikipedia table onto an Excel workbook has plenty of formatting errors.
+         The app's main purpose is to remove the difficulty of webscraping, reframing the dimensions of the table,
+         cleaning and classifying the numeric data, and exporting it to a CSV and Excel file. 
+         """)
 
 # %%
 ## Step 1: Insert URL
@@ -152,21 +163,28 @@ else:
     selected_columns = st.multiselect("Select numeric columns", options=df.columns)
 
 if selected_columns:
-    r_err = st.number_input("Enter number of decimal digits", min_value=0, value=0)
+    r_err = st.number_input("Enter rounding error decimal places", min_value=0, value=0)
+    thresh_err = st.number_input("Enter max number of digits", value = 16)
     df2 = clean_numeric_columns(df, col_names=selected_columns)
     numeric_cols = df2.select_dtypes(include=['number']).columns
-    df2 = df2.style.format({col: f'{{:.{r_err}f}}' for col in numeric_cols})
+    df2[numeric_cols] = df2[numeric_cols].round(r_err)
+
+    # Apply check to identify and replace large integers with NaN
+    for col in numeric_cols:
+        df2[col] = df2[col].apply(lambda x: pd.NA if isinstance(x, (int, float)) and abs(x) > 10**thresh_err else x)
+
 else: 
     df2 = df
 
 ## Step 4: Using the data editor
 st.subheader("Step 4: Fix Remaining Cells")
-st.write("Edit a value by double-clicking:") 
+st.write("Edit a value by double-clicking the cell") 
 df3 = st.data_editor(df2)
+st.write("Note: Some cells may require specific edits. Thousands-separator commas are native to Streamlit and do not affect final output.")
 
 ### Step 5: Download data file
 st.subheader("Step 5: Download the Data")
-userfilename = st.text_input("Enter in the name of your file", value="my_wikitable")
+userfilename = st.text_input("Enter in the desired name of your file", value="my_wikitable")
 
 # CSV
 @st.cache_data
