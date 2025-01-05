@@ -50,8 +50,8 @@ st.write("""
          This app is one of many options in the world to easily webscrape data for personal use. Wikipedia 
          is open source, and thus one of the most webscraped domains on the internt. However, webscraping can be difficult for those not
          familiar to it. Furthermore, copying and pasting raw data from a Wikipedia table onto an Excel workbook has plenty of formatting errors.
-         The app's main purpose is to remove the difficulty of webscraping, reframing the dimensions of the table,
-         cleaning and classifying the numeric data, and exporting it to a CSV and Excel file. 
+         The app's main purpose is to remove the difficulty of webscraping, with features that allow users to reframe the dimensions of the table,
+         identify the numeric columns, and export it to a CSV or Excel file. 
          """)
 
 # %%
