@@ -11,8 +11,12 @@ import io
 
 # Functions
 def copy_to_clipboard(text):
-    pyperclip.copy(text)
-    st.success("Copied to clipboard!")
+    try:
+        pyperclip.copy(text)
+        st.success("Copied to clipboard!")
+    except pyperclip.PyperclipException as e:
+        st.warning("Clipboard functionality is not supported in this environment. Click the link below:")
+        st.markdown(f"[Go to the website]({text})", unsafe_allow_html=True)
 
 def clean_numeric_columns(df, col_names):
     """
